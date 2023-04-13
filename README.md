@@ -1,6 +1,7 @@
 # Java-Docs-Generator
 
-<img width="1280" alt="Screenshot 2023-04-10 at 8 56 26 PM" src="https://user-images.githubusercontent.com/49298134/231174370-c8134817-53ee-400e-a330-888e2a1b3084.png">
+<img width="1438" alt="Screenshot 2023-04-12 at 7 58 28 PM" src="https://user-images.githubusercontent.com/49298134/231618495-84f4ea52-4e3d-497c-a311-cd1d17e6d535.png">
+
 
 <ins>Introduction</ins> </br>
 This is a Java documentation generator that utilizes Vite + React, Tailwind CSS and ChatGPT 3.5 Turbo. This documentation generator is designed to provide an efficient and user-friendly experience for developers who need to generate documentation for their Java projects. With this generator, developers can easily generate high-quality documentation with just a few clicks.
