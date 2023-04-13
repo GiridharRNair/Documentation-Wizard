@@ -75,7 +75,7 @@ function DocsGen () {
     'rounded-md',
     {
       'text-black': (status === 'Generate Documentation'),
-      'text-red-600': (status === 'Error, Try Again'),
+      'text-red-600 duration-150 animate:shake': (status === 'Error, Try Again'),
       'disabled' : (loading)
     }
   )
@@ -173,10 +173,10 @@ function DocsGen () {
         {response}
       </SyntaxHighlighter>
       <div className='flex-row space-x-2'>
-        {response !== "//Your altered Java code will appear here" ? (
+        {(response !== "//Your altered Java code will appear here" && !loading) ? (
           <button
             onClick={resetButtonClick}
-            className='text-xs bg-gray-500 w-[17vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
+            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
           >
             Reset
           </button>
@@ -187,6 +187,14 @@ function DocsGen () {
             className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
           >
             Copy to clipboard
+          </button>
+        ) : null}
+        {loading ? (
+          <button
+            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-red-600 rounded-md'
+            onClick={handleAbort}
+          >
+            Cancel
           </button>
         ) : null}
       </div>
