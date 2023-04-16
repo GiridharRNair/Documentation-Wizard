@@ -8,6 +8,7 @@ This is a documentation generator that utilizes Vite + React, Tailwind CSS and C
 
 <ins>Features</ins> </br>
 Generates high-quality documentation for programming projects. </br>
+Ability to detect the current programming language being inputed. </br>
 Utilizes Vite and React for a modern, fast, and responsive user interface. </br>
 Uses ChatGPT 3.5 Turbo for intelligent and natural language generation. </br>
 
@@ -22,4 +23,4 @@ To use the documentation generator, follow these steps: </br>
 &nbsp; Open the generator in your web browser </br>
 &nbsp; Cpoy the contents in the programming project file </br>
 &nbsp; Click "Generate Documentation" to generate your documentation </br>
-&nbsp; View and copy or download your documentation </br>
+&nbsp; View and copy your documentation </br>
