@@ -3,12 +3,12 @@ import DocsGen from './DocsGen';
 function App() {
 
   return (
-    <div className='font-mono overflow-y-scroll no-scrollbar flex-col bg-neutral-900 w-screen h-screen space-y-5 py-3'>
-      <p className='text-white hover:text-green-600 text-xl font-bold text-center'>
-        Java Docs Generator
+    <div className='font-mono overflow-y-scroll no-scrollbar flex-col bg-neutral-900 w-screen h-screen'>
+      <p className='text-white hover:text-green-600 text-xl font-bold text-center py-3'>
+        Documentation Wizard
       </p>
-      <p className='text-xs mx-[15vw] hover:text-green-600 text-white text-center'> 
-        Note that longer code may take more time to generate documentation, so meaningful variable names are recommended.       
+      <p className='text-xs mx-[15vw] hover:text-green-600 text-white text-center py-1'> 
+        A documentation generator, powered by ChatGPT 3.5 Turbo, that simplifies the process of creating concise and accurate documentation for programming languages. Note that longer code may take more time to generate documentation, so meaningful variable names are recommended.       
       </p>
       <DocsGen />
       <div className='underline text-xs text-white hover:text-green-600 fixed bottom-2 right-2'>

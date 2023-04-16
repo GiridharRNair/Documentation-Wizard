@@ -1,18 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Editor } from '@monaco-editor/react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { Prism as PrismSyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import classNames from 'classnames';
+import detectLang from 'lang-detector';
 
 const currStatus = ['Generating', 'Generating.', 'Generating..', ' Generating...']
 
 function DocsGen () {
 
   const editorRef = useRef(null);
-  const [value, setValue] = useState('//Input your raw Java code here');
-  const [response, setResponse] = useState('//Your altered Java code will appear here');
+  const [value, setValue] = useState('Input your raw code here');
+  const [response, setResponse] = useState('Your altered code will appear here');
   const [status, setStatus] = useState('Generate Documentation');
   const [loading, isLoading] = useState(false)
+  const [language, setLanguage] = useState("Unknown")
   const abortController = useRef(null);
 
   let intervalId;
@@ -57,13 +59,25 @@ function DocsGen () {
     clearInterval(intervalId);
   }
 
+  function handleEditorChange (newValue) {
+    clearOnChange();
+    getLanguage(newValue);
+  }
+
+  function getLanguage (value) {
+    var lang = detectLang(value);
+    console.log(lang);
+    setLanguage(lang.toLowerCase())
+  }
+
   function clearOnChange () {
     setValue('')
   }
 
   function resetButtonClick () {
-    setResponse('//Your altered Java code will appear here');
-    setValue('//Input your raw code here');
+    setResponse('Your altered code will appear here');
+    setValue('Input your raw code here');
+    setStatus('Generate Documentation');    
   };
 
   const buttonClass = classNames(
@@ -86,7 +100,6 @@ function DocsGen () {
 
   function handleSend (textIn) {
     if (textIn !== "//Input your raw code here" && !(isStringEmptyOrSpaces(textIn))) {
-      console.log(textIn)
       startInterval();
       fetch(`https://api.openai.com/v1/chat/completions`,
       {
@@ -94,7 +107,7 @@ function DocsGen () {
           "model": "gpt-3.5-turbo",
           "messages": [
             {role: "system", 
-            content: "Properly format and add documentation to this Java code (keep code under column 100): \n" + textIn}
+            content: "Properly format and add documentation to this code (keep code under column 100): \n" + textIn}
           ],
         }), 
         method: "POST",
@@ -107,6 +120,7 @@ function DocsGen () {
       .then((response) => response.json())
       .then((data) => {
         setResponse(data.choices[0].message.content);
+        console.log(ddata.choices[0].message.content);
       })
       .catch(error => {
         if (error.name === "AbortError") 
@@ -114,7 +128,7 @@ function DocsGen () {
       })
       .finally(() => {
         stopInterval();
-        setStatus('Generate Documentation');
+        setStatus('Regenerate Documentation');
       })
     }
   }
@@ -134,29 +148,20 @@ function DocsGen () {
       resetAbortController();
     }
   };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      const contents = event.target.result;
-      const ast = javaParser.parse(contents);
-      setValue(renderAst(ast));
-    };
-
-    reader.readAsText(file);
-  };
   
   return (
     <div className="flex-col font-mono w-[100vh] h-[30vh] mx-auto space-y-2">   
+      <p className='py-2 text-xs mx-[15vw] hover:text-green-600 text-white text-center'>
+        Current Programming Language Detected: {language}
+      </p>
       <Editor
         theme='vs-dark'
-        defaultLanguage="java"
+        language={language}
         onMount={handleEditorDidMount}
         value={value}
-        onChange={clearOnChange}
+        onChange={handleEditorChange}
         className='h-[30vh] rounded-md'
+        options={{domReadOnly: loading, readOnly: loading,}}
       />
       <button 
         onClick={() => getEditorValue()}
@@ -165,15 +170,15 @@ function DocsGen () {
       >
         {status}
       </button>
-      <SyntaxHighlighter
-        language="java"
+      <PrismSyntaxHighlighter
+        language={language}
         style={vscDarkPlus}
         className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
       >
         {response}
-      </SyntaxHighlighter>
+      </PrismSyntaxHighlighter>
       <div className='flex-row space-x-2'>
-        {(response !== "//Your altered Java code will appear here" && !loading) ? (
+        {(response !== "Your altered code will appear here" && !loading) ? (
           <button
             onClick={resetButtonClick}
             className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
@@ -181,7 +186,7 @@ function DocsGen () {
             Reset
           </button>
         ) : null}
-        {response !== "//Your altered Java code will appear here" ? (
+        {(response !== "Your altered code will appear here" && !loading) ? (
           <button
             onClick={() => {navigator.clipboard.writeText(response)}}
             className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
