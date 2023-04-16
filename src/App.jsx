@@ -12,7 +12,7 @@ function App() {
       </p>
       <DocsGen />
       <div className='underline text-xs text-white hover:text-green-600 fixed bottom-2 right-2'>
-        <a href="https://github.com/SyntaxWarrior30/Java-Docs-Generator" target="_blank" rel="noopener noreferrer">Github</a>
+        <a href="https://github.com/SyntaxWarrior30/Documentation-Generator" target="_blank" rel="noopener noreferrer">Github</a>
       </div>
     </div>
   );
