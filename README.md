@@ -1,6 +1,6 @@
 # Documentation-Generator
 
-<img width="1438" alt="Screenshot 2023-04-12 at 7 58 28 PM" src="https://user-images.githubusercontent.com/49298134/231618495-84f4ea52-4e3d-497c-a311-cd1d17e6d535.png">
+<img width="1438" alt="Screenshot 2023-04-16 at 12 00 19 AM" src="https://user-images.githubusercontent.com/49298134/232272020-66530e59-3e5e-4d2b-a3b7-1c4d40e8be55.png">
 
 
 <ins>Introduction</ins> </br>
