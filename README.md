@@ -13,7 +13,7 @@ Utilizes Vite and React for a modern, fast, and responsive user interface. </br>
 Uses ChatGPT 3.5 Turbo for intelligent and natural language generation. </br>
 
 <ins>Installation</ins> </br>
-To use this documentation generator, follow these steps:  </br>
+To install this documentation generator, follow these steps:  </br>
 &nbsp; Clone this repository to your local machine  </br>
 &nbsp; Run npm install to install the required dependencies  </br>
 &nbsp; Run npm run dev to start the development server  </br>
