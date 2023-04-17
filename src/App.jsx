@@ -4,7 +4,7 @@ function App() {
 
   return (
     <div className='font-mono overflow-y-scroll no-scrollbar flex-col bg-neutral-900 w-screen h-screen'>
-      <p className='text-white hover:text-green-600 text-xl font-bold text-center py-3'>
+      <p className='text-white hover:text-green-600 text-xl font-bold text-center py-1'>
         Documentation Wizard
       </p>
       <p className='text-xs mx-[20vw] hover:text-green-600 text-white text-center py-1'> 

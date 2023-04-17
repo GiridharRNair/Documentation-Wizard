@@ -23,4 +23,4 @@ To use the documentation generator, follow these steps: </br>
 &nbsp; Open the generator in your web browser </br>
 &nbsp; Cpoy the contents in the programming project file </br>
 &nbsp; Click "Generate Documentation" to generate your documentation </br>
-&nbsp; View and copy your documentation </br>
+&nbsp; View and copy or download your documentation </br>
