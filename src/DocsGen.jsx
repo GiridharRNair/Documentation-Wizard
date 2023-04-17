@@ -6,6 +6,18 @@ import classNames from 'classnames';
 import detectLang from 'lang-detector';
 
 const currStatus = ['Generating', 'Generating.', 'Generating..', ' Generating...']
+const langFileExt = [
+  { name: 'javaScript', extension: '.js' },
+  { name: 'c', extension: ".c" },
+  { name: 'python', extension: '.py' },
+  { name: 'java', extension: '.java' },
+  { name: 'c++', extension: '.cpp' },
+  { name: 'html', extension: '.html' },
+  { name: 'css', extension: '.css' },
+  { name: 'ruby', extension: '.ruby' },
+  { name: 'go', extension: '.go' },
+  { name: 'php', extension: '.php' }
+]
 
 function DocsGen () {
 
@@ -13,8 +25,9 @@ function DocsGen () {
   const [value, setValue] = useState('Input your raw code here');
   const [response, setResponse] = useState('Your altered code will appear here');
   const [status, setStatus] = useState('Generate Documentation');
-  const [loading, isLoading] = useState(false)
-  const [language, setLanguage] = useState("Unknown")
+  const [loading, isLoading] = useState(false);
+  const [language, setLanguage] = useState("Unknown");
+  const [fileExtension, setFileExt] = useState("none");
   const abortController = useRef(null);
 
   let intervalId;
@@ -65,9 +78,10 @@ function DocsGen () {
   }
 
   function getLanguage (value) {
-    var lang = detectLang(value);
-    console.log(lang);
-    setLanguage(lang.toLowerCase())
+    setLanguage(detectLang(value).toLowerCase());
+    if (language !== "Unknown") {
+      setFileExt(langFileExt.find(l => l.name === language).extension);
+    }
   }
 
   function clearOnChange () {
@@ -148,6 +162,18 @@ function DocsGen () {
       resetAbortController();
     }
   };
+
+  const handleDownload = () => {
+    const fileName = window.prompt('Enter file name:');
+    if (fileName !== null && fileName !== '') {
+      const element = document.createElement('a');
+      const file = new Blob([response], { type: 'text/plain' });
+      element.href = URL.createObjectURL(file);
+      element.download = fileName + fileExtension;
+      document.body.appendChild(element);
+      element.click();
+    }
+  };
   
   return (
     <div className="flex-col font-mono w-[100vh] h-[30vh] mx-auto space-y-2">   
@@ -192,6 +218,14 @@ function DocsGen () {
             className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
           >
             Copy to clipboard
+          </button>
+        ) : null}
+        {(response !== "Your altered code will appear here" && !loading) ? (
+          <button
+            onClick={handleDownload}
+            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
+          >
+            Download
           </button>
         ) : null}
         {loading ? (
