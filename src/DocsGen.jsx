@@ -4,6 +4,9 @@ import { Prism as PrismSyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import classNames from 'classnames';
 import detectLang from 'lang-detector';
+import { Tooltip } from 'react-tippy';
+import 'react-tippy/dist/tippy.css'
+
 
 const currStatus = ['Generating', 'Generating.', 'Generating..', ' Generating...']
 const langFileExt = [
@@ -21,6 +24,7 @@ const langFileExt = [
 
 function DocsGen () {
 
+  const fileInputRef = useRef(null);
   const editorRef = useRef(null);
   const [value, setValue] = useState('Input your raw code here');
   const [response, setResponse] = useState('Your altered code will appear here');
@@ -73,7 +77,8 @@ function DocsGen () {
   }
 
   function handleEditorChange (newValue) {
-    clearOnChange();
+    if (newValue.includes("Input your raw code here"))
+      clearOnChange();
     getLanguage(newValue);
   }
 
@@ -91,7 +96,8 @@ function DocsGen () {
   function resetButtonClick () {
     setResponse('Your altered code will appear here');
     setValue('Input your raw code here');
-    setStatus('Generate Documentation');    
+    setStatus('Generate Documentation'); 
+    fileInputRef.current.value = null;   
   };
 
   const buttonClass = classNames(
@@ -142,7 +148,7 @@ function DocsGen () {
       })
       .finally(() => {
         stopInterval();
-        setStatus('Regenerate Documentation');
+        setStatus('Generate Documentation');
       })
     }
   }
@@ -174,12 +180,37 @@ function DocsGen () {
       element.click();
     }
   };
-  
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setValue(event.target.result);
+      setResponse("Your altered code will appear here");
+    };
+    reader.readAsText(file);
+  };
+
   return (
-    <div className="flex-col font-mono w-[100vh] h-[30vh] mx-auto space-y-2">   
-      <p className='py-2 text-xs mx-[15vw] hover:text-green-600 text-white text-center'>
-        Current Programming Language Detected: {language}
+    <div className="flex-col w-[100vh] h-[30vh] mx-auto space-y-2">   
+      <p className='py-2 text-xs hover:text-green-600 text-white text-center'>
+        Programming Language Detected: {language}
       </p>
+      <Tooltip
+        title="Can't upload files during generation"
+        disabled={!loading}
+        duration={200}
+      >
+        <input
+          className="m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-green-600 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-gray-500 dark:file:text-neutral-100 dark:focus:border-primary"
+          type="file"
+          onChange={handleFileSelect}
+          disabled={loading}
+          ref={fileInputRef}
+          onMouseOver={() => setIsDisabled(true)}
+          onMouseLeave={() => setIsDisabled(false)}
+        />    
+      </Tooltip>
       <Editor
         theme='vs-dark'
         language={language}
@@ -204,10 +235,10 @@ function DocsGen () {
         {response}
       </PrismSyntaxHighlighter>
       <div className='flex-row space-x-2'>
-        {(response !== "Your altered code will appear here" && !loading) ? (
+        {(!loading && value !== "Input your raw code here") ? (
           <button
             onClick={resetButtonClick}
-            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
+            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
           >
             Reset
           </button>
@@ -215,7 +246,7 @@ function DocsGen () {
         {(response !== "Your altered code will appear here" && !loading) ? (
           <button
             onClick={() => {navigator.clipboard.writeText(response)}}
-            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
+            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
           >
             Copy to clipboard
           </button>
@@ -223,14 +254,14 @@ function DocsGen () {
         {(response !== "Your altered code will appear here" && !loading) ? (
           <button
             onClick={handleDownload}
-            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-green-600 rounded-md'
+            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
           >
             Download
           </button>
         ) : null}
         {loading ? (
           <button
-            className='text-xs bg-gray-500 w-[20vh] text-center h-[4vh] hover:bg-red-600 rounded-md'
+            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-red-600 rounded-md'
             onClick={handleAbort}
           >
             Cancel
