@@ -1,4 +1,4 @@
-# Documentation-Generator
+# Documentation-Wizard
 
 <img width="800" alt="Screenshot 2023-04-17 at 10 55 55 PM" src="https://user-images.githubusercontent.com/49298134/232668746-483f9f44-ca1c-4b0f-8dd4-121873c14da2.png">
 
