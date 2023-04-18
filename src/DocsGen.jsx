@@ -6,27 +6,40 @@ import classNames from 'classnames';
 import detectLang from 'lang-detector';
 import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css'
+import flourite from 'flourite';
 
 
 const currStatus = ['Generating', 'Generating.', 'Generating..', ' Generating...']
-const langFileExt = [
-  { name: 'javaScript', extension: '.js' },
-  { name: 'c', extension: ".c" },
-  { name: 'python', extension: '.py' },
-  { name: 'java', extension: '.java' },
-  { name: 'c++', extension: '.cpp' },
-  { name: 'html', extension: '.html' },
-  { name: 'css', extension: '.css' },
-  { name: 'ruby', extension: '.ruby' },
-  { name: 'go', extension: '.go' },
-  { name: 'php', extension: '.php' }
-]
+const languageToFileExtension = {
+  'C': '.c',
+  'C++': '.cpp',
+  'C#': '.cs',
+  'Clojure': '.clj',
+  'CSS': '.css',
+  'Dockerfile': '.dockerfile',
+  'Elixir': '.ex',
+  'Go': '.go',
+  'HTML': '.html',
+  'Java': '.java',
+  'Javascript': '.js',
+  'Julia': '.jl',
+  'Kotlin': '.kt',
+  'Lua': '.lua',
+  'Markdown': '.md',
+  'Pascal': '.pas',
+  'PHP': '.php',
+  'Python': '.py',
+  'Ruby': '.rb',
+  'Rust': '.rs',
+  'SQL': '.sql',
+  'YAML': '.yaml'
+};
 
 function DocsGen () {
 
   const fileInputRef = useRef(null);
   const editorRef = useRef(null);
-  const [value, setValue] = useState('Input your raw code here');
+  const [value, setValue] = useState('Input your raw code here:');
   const [response, setResponse] = useState('Your altered code will appear here');
   const [status, setStatus] = useState('Generate Documentation');
   const [loading, isLoading] = useState(false);
@@ -77,16 +90,20 @@ function DocsGen () {
   }
 
   function handleEditorChange (newValue) {
-    if (newValue.includes("Input your raw code here"))
+    if (newValue.includes("Input your raw code here:"))
       clearOnChange();
     getLanguage(newValue);
   }
 
   function getLanguage (value) {
-    setLanguage(detectLang(value).toLowerCase());
-    if (language !== "Unknown") {
-      setFileExt(langFileExt.find(l => l.name === language).extension);
+    setLanguage(flourite(value).language);
+    if (language !== "unknown") {
+      setFileExt(getFileExtension(language));
     }
+  }
+
+  function getFileExtension(language) {
+    return languageToFileExtension[language] || '';
   }
 
   function clearOnChange () {
@@ -95,7 +112,7 @@ function DocsGen () {
 
   function resetButtonClick () {
     setResponse('Your altered code will appear here');
-    setValue('Input your raw code here');
+    setValue('Input your raw code here:');
     setStatus('Generate Documentation'); 
     fileInputRef.current.value = null;   
   };
@@ -119,7 +136,7 @@ function DocsGen () {
   }
 
   function handleSend (textIn) {
-    if (textIn !== "//Input your raw code here" && !(isStringEmptyOrSpaces(textIn))) {
+    if (textIn !== "Input your raw code here:" && !(isStringEmptyOrSpaces(textIn))) {
       startInterval();
       fetch(`https://api.openai.com/v1/chat/completions`,
       {
@@ -140,7 +157,7 @@ function DocsGen () {
       .then((response) => response.json())
       .then((data) => {
         setResponse(data.choices[0].message.content);
-        console.log(ddata.choices[0].message.content);
+        console.log(data.choices[0].message.content);
       })
       .catch(error => {
         if (error.name === "AbortError") 
@@ -211,7 +228,7 @@ function DocsGen () {
       </Tooltip>
       <Editor
         theme='vs-dark'
-        language={language}
+        language={language.toLowerCase()}
         onMount={handleEditorDidMount}
         value={value}
         onChange={handleEditorChange}
@@ -226,7 +243,7 @@ function DocsGen () {
         {status}
       </button>
       <PrismSyntaxHighlighter
-        language={language}
+        language={language.toLowerCase()}
         style={vscDarkPlus}
         className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
       >
