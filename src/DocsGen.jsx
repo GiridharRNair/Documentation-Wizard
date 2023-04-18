@@ -3,7 +3,6 @@ import { Editor } from '@monaco-editor/react';
 import { Prism as PrismSyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import classNames from 'classnames';
-import detectLang from 'lang-detector';
 import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css'
 import flourite from 'flourite';
@@ -90,9 +89,11 @@ function DocsGen () {
   }
 
   function handleEditorChange (newValue) {
-    if (newValue.includes("Input your raw code here:"))
+    if (newValue.includes("Input your raw code here:")) {
       clearOnChange();
-    getLanguage(newValue);
+    } else {
+      getLanguage(newValue);
+    }
   }
 
   function getLanguage (value) {
@@ -107,13 +108,15 @@ function DocsGen () {
   }
 
   function clearOnChange () {
-    setValue('')
+    setValue('');
+    setLanguage("Unknown");
   }
 
   function resetButtonClick () {
     setResponse('Your altered code will appear here');
     setValue('Input your raw code here:');
     setStatus('Generate Documentation'); 
+    setLanguage("Unknown");
     fileInputRef.current.value = null;   
   };
 
@@ -202,6 +205,7 @@ function DocsGen () {
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onload = (event) => {
+      handleEditorChange(event.target.result);
       setValue(event.target.result);
       setResponse("Your altered code will appear here");
     };
