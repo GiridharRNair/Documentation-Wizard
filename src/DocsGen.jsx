@@ -45,6 +45,7 @@ function DocsGen () {
   const [language, setLanguage] = useState("Unknown");
   const [fileExtension, setFileExt] = useState("none");
   const abortController = useRef(null);
+  const accept = Object.values(languageToFileExtension).join(",");
 
   let intervalId;
   var statusChange = 0;
@@ -129,7 +130,7 @@ function DocsGen () {
     'rounded-md',
     {
       'text-black': (status === 'Generate Documentation'),
-      'text-red-600 duration-150 animate:shake': (status === 'Error, Try Again'),
+      'text-red-600 shake': (status === 'Error, Click To Try Again'),
       'disabled' : (loading)
     }
   )
@@ -147,7 +148,7 @@ function DocsGen () {
           "model": "gpt-3.5-turbo",
           "messages": [
             {role: "system", 
-            content: "Properly format and add documentation to this code (keep code under column 100): \n" + textIn}
+            content: "Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn}
           ],
         }), 
         method: "POST",
@@ -161,14 +162,17 @@ function DocsGen () {
       .then((data) => {
         setResponse(data.choices[0].message.content);
         console.log(data.choices[0].message.content);
+        setStatus('Generate Documentation');
+        stopInterval();
       })
       .catch(error => {
-        if (error.name === "AbortError") 
-          console.log("Fetch aborted");
-      })
-      .finally(() => {
-        stopInterval();
-        setStatus('Generate Documentation');
+        if (error.name === "AbortError") {
+          setStatus("Generate Documentation");
+          stopInterval();
+        } else {
+          setStatus("Error, Click To Try Again");
+          stopInterval();
+        }
       })
     }
   }
@@ -218,7 +222,7 @@ function DocsGen () {
         Programming Language Detected: {language}
       </p>
       <Tooltip
-        title="Can't upload files during generation"
+        title={"Can't upload files during generation"}
         disabled={!loading}
         duration={200}
       >
@@ -228,6 +232,7 @@ function DocsGen () {
           onChange={handleFileSelect}
           disabled={loading}
           ref={fileInputRef}
+          accept={accept}
         />    
       </Tooltip>
       <Editor
@@ -237,7 +242,7 @@ function DocsGen () {
         value={value}
         onChange={handleEditorChange}
         className='h-[30vh] rounded-md'
-        options={{domReadOnly: loading, readOnly: loading,}}
+        options={{domReadOnly: loading, readOnly: loading}}
       />
       <button 
         onClick={() => getEditorValue()}
