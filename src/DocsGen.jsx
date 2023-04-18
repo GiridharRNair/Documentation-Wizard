@@ -207,8 +207,6 @@ function DocsGen () {
           onChange={handleFileSelect}
           disabled={loading}
           ref={fileInputRef}
-          onMouseOver={() => setIsDisabled(true)}
-          onMouseLeave={() => setIsDisabled(false)}
         />    
       </Tooltip>
       <Editor
