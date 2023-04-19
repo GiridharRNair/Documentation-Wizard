@@ -8,7 +8,7 @@ function App() {
         Documentation Wizard
       </p>
       <p className='text-xs mx-[15vw] hover:text-green-600 text-white text-center py-1'> 
-        Note that longer code may take more time to generate documentation, so meaningful variable names are recommended.       
+        Note that lengthy code may take more time to generate documentation, so meaningful variable names are recommended.
       </p>
       <DocsGen />
       <div className='underline text-xs text-white hover:text-green-600 fixed bottom-2 right-2'>

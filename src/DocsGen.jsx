@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Editor } from '@monaco-editor/react';
 import { Prism as PrismSyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -93,8 +94,15 @@ function DocsGen () {
     if (newValue.includes("Input your raw code here:")) {
       clearOnChange();
     } else {
+      setValue(newValue);
       getLanguage(newValue);
     }
+  }
+
+  function countTokens(text) {
+    const tokenRegExp = /[^\s]+/g;
+    const tokens = text.match(tokenRegExp);
+    return tokens ? tokens.length : 0;
   }
 
   function getLanguage (value) {
@@ -130,7 +138,7 @@ function DocsGen () {
     'rounded-md',
     {
       'text-black': (status === 'Generate Documentation'),
-      'text-red-600 shake': (status === 'Error, Click To Try Again'),
+      'text-red-700 shake': (status === 'Error, Click To Try Again'),
       'disabled' : (loading)
     }
   )
@@ -140,7 +148,7 @@ function DocsGen () {
   }
 
   function handleSend (textIn) {
-    if (textIn !== "Input your raw code here:" && !(isStringEmptyOrSpaces(textIn))) {
+    if (textIn !== "Input your raw code here:" && !(isStringEmptyOrSpaces(textIn)) && (countTokens(value) <= 2048)) {
       startInterval();
       fetch(`https://api.openai.com/v1/chat/completions`,
       {
@@ -290,6 +298,11 @@ function DocsGen () {
           >
             Cancel
           </button>
+        ) : null}
+        {(countTokens(value) >= 2048) ? (
+          <p className='py-2 text-xs text-red-700 text-center'>
+            Code input is too long
+          </p>
         ) : null}
       </div>
     </div>
