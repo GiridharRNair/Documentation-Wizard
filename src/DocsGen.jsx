@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 import { Editor } from '@monaco-editor/react';
 import { Prism as PrismSyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -7,33 +6,12 @@ import classNames from 'classnames';
 import { Tooltip } from 'react-tippy';
 import 'react-tippy/dist/tippy.css'
 import flourite from 'flourite';
+import ChatGPT from './Components/ChatGPT'
+import DownloadButton from './Components/DownloadButton';
+import CopyButton from './Components/CopyButton';
+import { languageToFileExtension, getFileExtension } from './Components/Data'
 
-
-const currStatus = ['Generating', 'Generating.', 'Generating..', ' Generating...']
-const languageToFileExtension = {
-  'C': '.c',
-  'C++': '.cpp',
-  'C#': '.cs',
-  'Clojure': '.clj',
-  'CSS': '.css',
-  'Dockerfile': '.dockerfile',
-  'Elixir': '.ex',
-  'Go': '.go',
-  'HTML': '.html',
-  'Java': '.java',
-  'Javascript': '.js',
-  'Julia': '.jl',
-  'Kotlin': '.kt',
-  'Lua': '.lua',
-  'Markdown': '.md',
-  'Pascal': '.pas',
-  'PHP': '.php',
-  'Python': '.py',
-  'Ruby': '.rb',
-  'Rust': '.rs',
-  'SQL': '.sql',
-  'YAML': '.yaml'
-};
+const currStatus = ['Generating', 'Generating.', 'Generating..', ' Generating...'];
 
 function DocsGen () {
 
@@ -44,15 +22,11 @@ function DocsGen () {
   const [status, setStatus] = useState('Generate Documentation');
   const [loading, isLoading] = useState(false);
   const [language, setLanguage] = useState("Unknown");
-  const [fileExtension, setFileExt] = useState("none");
+  const [fileExtension, setFileExt] = useState('.txt');
   const abortController = useRef(null);
+  const chatbot = new ChatGPT();
   const accept = Object.values(languageToFileExtension).join(",");
 
-  let intervalId;
-  var statusChange = 0;
-
-  const API_KEY = import.meta.env.VITE_API_KEY;
-  
   useEffect(() => {
     resetAbortController();
   }, []);
@@ -63,6 +37,30 @@ function DocsGen () {
     }
     abortController.current = new AbortController();
   };
+
+  const handleAbort = () => {
+    if (abortController.current) {
+      abortController.current.abort();
+      resetAbortController();
+    }
+  };
+
+  const buttonClass = classNames(
+    'bg-gray-500',
+    'w-[100vh]',
+    'text-center',
+    'h-[5vh]',
+    'hover:bg-green-600',
+    'rounded-md',
+    {
+      'text-black': (status === 'Generate Documentation'),
+      'text-red-700 shake': (status === 'Error, Click To Try Again'),
+      'disabled' : (loading)
+    }
+  )
+
+  let intervalId;
+  var statusChange = 0;
 
   function statusUpdate () {
     if (statusChange === 0) {
@@ -92,17 +90,12 @@ function DocsGen () {
 
   function handleEditorChange (newValue) {
     if (newValue.includes("Input your raw code here:")) {
-      clearOnChange();
+      setValue('');
+      setLanguage("Unknown");
     } else {
       setValue(newValue);
       getLanguage(newValue);
     }
-  }
-
-  function countTokens(text) {
-    const tokenRegExp = /[^\s]+/g;
-    const tokens = text.match(tokenRegExp);
-    return tokens ? tokens.length : 0;
   }
 
   function getLanguage (value) {
@@ -112,106 +105,20 @@ function DocsGen () {
     }
   }
 
-  function getFileExtension(language) {
-    return languageToFileExtension[language] || '';
-  }
-
-  function clearOnChange () {
-    setValue('');
-    setLanguage("Unknown");
-  }
-
-  function resetButtonClick () {
-    setResponse('Your altered code will appear here');
-    setValue('Input your raw code here:');
-    setStatus('Generate Documentation'); 
-    setLanguage("Unknown");
-    fileInputRef.current.value = null;   
-  };
-
-  const buttonClass = classNames(
-    'bg-gray-500',
-    'w-[100vh]',
-    'text-center',
-    'h-[5vh]',
-    'hover:bg-green-600',
-    'rounded-md',
-    {
-      'text-black': (status === 'Generate Documentation'),
-      'text-red-700 shake': (status === 'Error, Click To Try Again'),
-      'disabled' : (loading)
-    }
-  )
-
-  function isStringEmptyOrSpaces(str) {
-    return str.trim() === '';
-  }
-
-  function handleSend (textIn) {
-    if (textIn !== "Input your raw code here:" && !(isStringEmptyOrSpaces(textIn)) && (countTokens(value) <= 2048)) {
-      startInterval();
-      fetch(`https://api.openai.com/v1/chat/completions`,
-      {
-        body: JSON.stringify({
-          "model": "gpt-3.5-turbo",
-          "messages": [
-            {role: "system", 
-            content: "Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn}
-          ],
-        }), 
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-        Authorization: "Bearer " + API_KEY,
-        },
-        signal: abortController.current.signal,
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        setResponse(data.choices[0].message.content);
-        console.log(data.choices[0].message.content);
-        setStatus('Generate Documentation');
-        stopInterval();
-      })
-      .catch(error => {
-        if (error.name === "AbortError") {
-          setStatus("Generate Documentation");
-          stopInterval();
-        } else {
-          setStatus("Error, Click To Try Again");
-          stopInterval();
-        }
-      })
-    }
-  }
-
   function handleEditorDidMount(editor) {
     editorRef.current = editor;
   }
 
-  function getEditorValue() {
-    const inputCode = editorRef.current.getValue();
-    handleSend(inputCode);
+  async function generateDocs() {
+    const textIn = editorRef.current.getValue();
+    if (textIn !== "Input your raw code here:" && !(textIn.trim() === '') && (countTokens(value) <= 2048)) {
+      startInterval();
+      const answer = await chatbot.ask("Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn, abortController.current);
+      setResponse(answer);
+      stopInterval();
+      setStatus('Generate Documentation');
+    }
   }
-
-  const handleAbort = () => {
-    if (abortController.current) {
-      abortController.current.abort();
-      resetAbortController();
-    }
-  };
-
-  const handleDownload = () => {
-    const fileName = window.prompt('Enter file name:');
-    if (fileName !== null && fileName !== '') {
-      const element = document.createElement('a');
-      const file = new Blob([response], { type: 'text/plain' });
-      element.href = URL.createObjectURL(file);
-      element.download = fileName + fileExtension;
-      document.body.appendChild(element);
-      element.click();
-    }
-  };
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
@@ -222,6 +129,20 @@ function DocsGen () {
       setResponse("Your altered code will appear here");
     };
     reader.readAsText(file);
+  };
+
+  function countTokens (text) {
+    const tokenRegExp = /[^\s]+/g;
+    const tokens = text.match(tokenRegExp);
+    return tokens ? tokens.length : 0;
+  }
+
+  function resetButtonClick () {
+    setResponse('Your altered code will appear here');
+    setValue('Input your raw code here:');
+    setStatus('Generate Documentation'); 
+    setLanguage("Unknown");
+    fileInputRef.current.value = null;   
   };
 
   return (
@@ -253,7 +174,7 @@ function DocsGen () {
         options={{domReadOnly: loading, readOnly: loading}}
       />
       <button 
-        onClick={() => getEditorValue()}
+        onClick={() => generateDocs()}
         className={buttonClass}
         disabled={loading}
       >
@@ -276,20 +197,10 @@ function DocsGen () {
           </button>
         ) : null}
         {(response !== "Your altered code will appear here" && !loading) ? (
-          <button
-            onClick={() => {navigator.clipboard.writeText(response)}}
-            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
-          >
-            Copy to clipboard
-          </button>
+          <CopyButton content={response}/>
         ) : null}
         {(response !== "Your altered code will appear here" && !loading) ? (
-          <button
-            onClick={handleDownload}
-            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
-          >
-            Download
-          </button>
+          <DownloadButton content={response} fileType={fileExtension}/>
         ) : null}
         {loading ? (
           <button
