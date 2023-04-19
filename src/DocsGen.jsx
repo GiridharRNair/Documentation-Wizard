@@ -26,6 +26,7 @@ function DocsGen () {
   const abortController = useRef(null);
   const chatbot = new ChatGPT();
   const accept = Object.values(languageToFileExtension).join(",");
+  const [error, isError] = useState(false);
 
   useEffect(() => {
     resetAbortController();
@@ -54,7 +55,7 @@ function DocsGen () {
     'rounded-md',
     {
       'text-black': (status === 'Generate Documentation'),
-      'text-red-700 shake': (status === 'Error, Click To Try Again'),
+      'text-red-700 shake': (error && status === 'Error, Click To Try Again'),
       'disabled' : (loading)
     }
   )
@@ -110,13 +111,21 @@ function DocsGen () {
   }
 
   async function generateDocs() {
+    isError(false);
     const textIn = editorRef.current.getValue();
     if (textIn !== "Input your raw code here:" && !(textIn.trim() === '') && (countTokens(value) <= 2048)) {
       startInterval();
       const answer = await chatbot.ask("Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn, abortController.current);
-      setResponse(answer);
-      stopInterval();
-      setStatus('Generate Documentation');
+      console.log(answer)
+      if (answer === "Error") {
+        isError(true)
+        stopInterval();
+        setStatus("Error, Click To Try Again") 
+      } else {
+        setResponse(answer);
+        stopInterval();
+        setStatus('Generate Documentation');
+      }
     }
   }
 
