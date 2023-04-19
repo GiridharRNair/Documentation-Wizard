@@ -21,6 +21,7 @@ To use the documentation generator, follow these steps: </br>
 <ins>Installation</ins> </br>
 To install this documentation generator, follow these steps:  </br>
 &nbsp; Clone this repository to your local machine  </br>
+&nbsp; Rename .env.exmaple to .env and put your OpenAI API key inside  </br>
 &nbsp; Run npm install to install the required dependencies  </br>
 &nbsp; Run npm run dev to start the development server  </br>
 
