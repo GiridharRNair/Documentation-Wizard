@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-function DownloadButton({ content = '', fileType = '' }) {
+function DownloadButton({ content = '', fileType = '', response = '', loading = '' }) {
   
     async function handleDownload () {
         const fileName = window.prompt('Enter file name:');
@@ -15,12 +15,16 @@ function DownloadButton({ content = '', fileType = '' }) {
     };    
   
     return (
-        <button
-            onClick={handleDownload}
-            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
-        >
-            Download
-        </button>
+        <>
+            {(response !== "Your altered code will appear here" && !loading) ? (
+                <button
+                    onClick={handleDownload}
+                    className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
+                >
+                    Download
+                </button>
+            ) : null}
+        </>
     )
 }
 

@@ -55,7 +55,7 @@ function DocsGen () {
     'rounded-md',
     {
       'text-black': (status === 'Generate Documentation'),
-      'text-red-700 shake': (error && status === 'Error, Click To Try Again'),
+      'text-red-700 shake': (error && (status === 'Error, Click To Try Again' || status === 'Input Is Too Long, Click To Try Again')),
       'disabled' : (loading)
     }
   )
@@ -95,11 +95,11 @@ function DocsGen () {
       setLanguage("Unknown");
     } else {
       setValue(newValue);
-      getLanguage(newValue);
+      detectLang(newValue);
     }
   }
 
-  function getLanguage (value) {
+  function detectLang (value) {
     setLanguage(flourite(value).language);
     if (language !== "unknown") {
       setFileExt(getFileExtension(language));
@@ -111,22 +111,32 @@ function DocsGen () {
   }
 
   async function generateDocs() {
+    setResponse('Your altered code will appear here');
     isError(false);
+    startInterval();
     const textIn = editorRef.current.getValue();
-    if (textIn !== "Input your raw code here:" && !(textIn.trim() === '') && (countTokens(value) <= 2048)) {
-      startInterval();
-      const answer = await chatbot.ask("Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn, abortController.current);
-      console.log(answer)
-      if (answer === "Error") {
+    if ((textIn !== "Input your raw code here:") && !(textIn.trim() === '')) {
+      console.log(countTokens(textIn));
+      await new Promise(resolve => {
+        setTimeout(resolve, 1000);
+      });
+      if (countTokens(textIn) < 2048) {
+        const answer = await chatbot.ask("Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn, abortController.current);
+        if (answer === "Error") {
+          isError(true)
+          stopInterval();
+          setStatus("Error, Click To Try Again") 
+        } else {
+          setResponse(answer);
+          stopInterval();
+          setStatus('Generate Documentation');
+        }
+      } else {
         isError(true)
         stopInterval();
-        setStatus("Error, Click To Try Again") 
-      } else {
-        setResponse(answer);
-        stopInterval();
-        setStatus('Generate Documentation');
+        setStatus("Input Is Too Long, Click To Try Again") 
       }
-    }
+    } 
   }
 
   const handleFileSelect = (event) => {
@@ -205,12 +215,8 @@ function DocsGen () {
             Reset
           </button>
         ) : null}
-        {(response !== "Your altered code will appear here" && !loading) ? (
-          <CopyButton content={response}/>
-        ) : null}
-        {(response !== "Your altered code will appear here" && !loading) ? (
-          <DownloadButton content={response} fileType={fileExtension}/>
-        ) : null}
+        <CopyButton content={response} response={response} loading={loading}/>
+        <DownloadButton content={response} fileType={fileExtension} response={response} loading={loading}/>
         {loading ? (
           <button
             className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-red-600 rounded-md'
@@ -219,15 +225,10 @@ function DocsGen () {
             Cancel
           </button>
         ) : null}
-        {(countTokens(value) >= 2048) ? (
-          <p className='py-2 text-xs text-red-700 text-center'>
-            Code input is too long
-          </p>
-        ) : null}
       </div>
     </div>
   )
 };
   
-export default DocsGen;
+export default DocsGen; 
   
