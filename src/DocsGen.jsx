@@ -17,7 +17,7 @@ function DocsGen () {
 
   const fileInputRef = useRef(null);
   const editorRef = useRef(null);
-  const [value, setValue] = useState('Input your raw code here:');
+  const [value, setValue] = useState('');
   const [response, setResponse] = useState('Your altered code will appear here');
   const [status, setStatus] = useState('Generate Documentation');
   const [loading, isLoading] = useState(false);
@@ -90,13 +90,8 @@ function DocsGen () {
   }
 
   function handleEditorChange (newValue) {
-    if (newValue.includes("Input your raw code here:")) {
-      setValue('');
-      setLanguage("Unknown");
-    } else {
-      setValue(newValue);
-      detectLang(newValue);
-    }
+    setValue(newValue);
+    detectLang(newValue);
   }
 
   function detectLang (value) {
@@ -113,9 +108,9 @@ function DocsGen () {
   async function generateDocs() {
     setResponse('Your altered code will appear here');
     isError(false);
-    startInterval();
     const textIn = editorRef.current.getValue();
-    if ((textIn !== "Input your raw code here:") && !(textIn.trim() === '')) {
+    if (textIn.trim() !== '') {
+      startInterval();
       console.log(countTokens(textIn));
       await new Promise(resolve => {
         setTimeout(resolve, 1000);
@@ -158,7 +153,7 @@ function DocsGen () {
 
   function resetButtonClick () {
     setResponse('Your altered code will appear here');
-    setValue('Input your raw code here:');
+    setValue('');
     setStatus('Generate Documentation'); 
     setLanguage("Unknown");
     fileInputRef.current.value = null;   
@@ -185,7 +180,7 @@ function DocsGen () {
       </Tooltip>
       <Editor
         theme='vs-dark'
-        language={language.toLowerCase()}
+        language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
         onMount={handleEditorDidMount}
         value={value}
         onChange={handleEditorChange}
@@ -200,14 +195,14 @@ function DocsGen () {
         {status}
       </button>
       <PrismSyntaxHighlighter
-        language={language.toLowerCase()}
+        language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
         style={vscDarkPlus}
         className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
       >
         {response}
       </PrismSyntaxHighlighter>
       <div className='flex-row space-x-2'>
-        {(!loading && value !== "Input your raw code here:")? (
+        {(!loading && value !== '')? (
           <button
             onClick={resetButtonClick}
             className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
