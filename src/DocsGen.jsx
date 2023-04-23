@@ -202,7 +202,7 @@ function DocsGen () {
         {response}
       </PrismSyntaxHighlighter>
       <div className='flex-row space-x-2'>
-        {(!loading && value !== '')? (
+        {(!loading && value) ? (
           <button
             onClick={resetButtonClick}
             className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
