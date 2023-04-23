@@ -1,5 +1,7 @@
 # Documentation-Wizard
 
+<img width="1438" alt="Screenshot 2023-04-22 at 11 34 16 PM" src="https://user-images.githubusercontent.com/49298134/233820116-71e82dc0-2124-47ba-b399-cd7eb836252f.png">
+
 Active Link: https://syntaxwarrior30.github.io/Documentation-Wizard/
 
 <ins>Introduction</ins> </br>
