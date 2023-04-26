@@ -29,7 +29,7 @@ Install dependencies
 ```bash
   npm install
 ```
-Rename .env.exmaple to .env and input your OpenAI API Key. </br>
+Rename `.env.exmaple` to `.env` and input your OpenAI API Key. </br>
 ```
 VITE_API_KEY={Your OpenAI API Key}
 ```
