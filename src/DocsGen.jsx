@@ -55,7 +55,7 @@ function DocsGen () {
     'rounded-md',
     {
       'text-black': (status === 'Generate Documentation'),
-      'text-red-700 shake': (error && (status === 'Error, Click To Try Again' || status === 'Input Is Too Long, Click To Try Again')),
+      'text-red-800 shake': (error && (status === 'Error, Click To Try Again' || status === 'Input Is Too Long, Click To Try Again')),
       'disabled' : (loading)
     }
   )
