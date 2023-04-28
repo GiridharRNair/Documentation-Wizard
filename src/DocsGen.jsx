@@ -27,14 +27,14 @@ function DocsGen () {
   const chatbot = new ChatGPT();
   const accept = Object.values(languageToFileExtension).join(",");
   const [error, isError] = useState(false);
-  const successAudio = new Audio('/public/Success.wav');
-  const errorAudio = new Audio('/public/Error.wav');
+  const successAudio = new Audio('/Success.wav');
+  const errorAudio = new Audio('/Error.wav');
 
   useEffect(() => {
-    resetAbortController();
+    clearAbortController();
   }, []);
 
-  const resetAbortController = () => {
+  const clearAbortController = () => {
     if (abortController.current) {
       abortController.current.abort();
     }
@@ -44,7 +44,7 @@ function DocsGen () {
   const handleAbort = () => {
     if (abortController.current) {
       abortController.current.abort();
-      resetAbortController();
+      clearAbortController();
     }
   };
 
@@ -155,7 +155,7 @@ function DocsGen () {
     return tokens ? tokens.length : 0;
   }
 
-  function resetButtonClick () {
+  function clearButtonClick () {
     setResponse('Your altered code will appear here');
     setValue('');
     setStatus('Generate Documentation'); 
@@ -207,12 +207,12 @@ function DocsGen () {
           {response}
         </PrismSyntaxHighlighter>
         <div className='flex-row space-x-2'>
-          {(!loading && value) ? (
+          {(!loading && value || (response !== 'Your altered code will appear here')) ? (
             <button
-              onClick={resetButtonClick}
+              onClick={clearButtonClick}
               className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
             >
-              Reset
+              Clear
             </button>
           ) : null}
           <CopyButton content={response} response={response} loading={loading}/>
