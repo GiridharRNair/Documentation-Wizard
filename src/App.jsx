@@ -7,7 +7,7 @@ function App() {
       <p className=' text-white hover:text-green-600 text-xl font-bold text-center'>
         Documentation Wizard
       </p>
-      <p className='text-xs mx-[25vw] hover:text-green-600 text-white text-center py-1'> 
+      <p className='text-xs mx-[15vw] hover:text-green-600 text-white text-center py-1'> 
         Note that lengthy code may take more time to generate documentation, so meaningful variable names are recommended. <br/> 
       </p>
       <p className='text-xs mx-[25vw] text-green-600 text-center py-1'>

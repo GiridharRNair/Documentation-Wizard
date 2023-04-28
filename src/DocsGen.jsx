@@ -27,8 +27,8 @@ function DocsGen () {
   const chatbot = new ChatGPT();
   const accept = Object.values(languageToFileExtension).join(",");
   const [error, isError] = useState(false);
-  const successAudio = new Audio('/Success.wav');
-  const errorAudio = new Audio('/Error.wav');
+  const successAudio = new Audio('/public/Success.wav');
+  const errorAudio = new Audio('/public/Error.wav');
 
   useEffect(() => {
     resetAbortController();
@@ -165,10 +165,10 @@ function DocsGen () {
 
   return (
     <>
-      <p className='py-2 text-xs hover:text-green-600 text-white text-center'>
+      <p className='-py-2 text-xs hover:text-green-600 text-white text-center'>
         Programming Language Detected: {language}
       </p>
-      <div className="flex-col w-[100vh] mx-auto space-y-2">   
+      <div className="flex-col w-[100vh] mx-auto py-2 space-y-2">   
         <Tooltip
           title={"Can't upload files during generation"}
           disabled={!loading}
