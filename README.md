@@ -1,8 +1,10 @@
 # Documentation-Wizard
 
-<img width="1438" alt="Screenshot 2023-04-22 at 11 34 16 PM" src="https://user-images.githubusercontent.com/49298134/233820116-71e82dc0-2124-47ba-b399-cd7eb836252f.png">
+<img alt="DocWizardScreenshot" src="public/DocWizardScreenShot.png">
+
 
 Active Link: https://syntaxwarrior30.github.io/Documentation-Wizard/
+
 
 <ins>Introduction</ins> </br>
 This is a documentation generator that utilizes Vite + React, Tailwind CSS and ChatGPT 3.5 Turbo API. </br>
@@ -29,7 +31,7 @@ Install dependencies
 ```bash
   npm install
 ```
-Rename `.env.exmaple` to `.env` and input your OpenAI API Key. </br>
+Rename `.env.exmaple` to `.env` and input your OpenAI API Key in the format shown below. </br>
 ```
 VITE_API_KEY={Your OpenAI API Key}
 ```
