@@ -168,7 +168,7 @@ function DocsGen () {
       <p className='-py-2 text-xs hover:text-green-600 text-white text-center'>
         Programming Language Detected: {language}
       </p>
-      <div className="flex-col w-[100vh] mx-auto py-2 space-y-2">   
+      <div className="flex-col w-[100vh] mx-auto py-5 space-y-2">   
         <Tooltip
           title={"Can't upload files during generation"}
           disabled={!loading}

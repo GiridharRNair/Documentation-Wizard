@@ -1,6 +1,6 @@
 # Documentation-Wizard
 
-<img alt="DocWizardScreenshot" src="public/DocWizardScreenShot.png">
+<img alt="DocWizardScreenshot" src="public/DocWizScreenShot.png">
 
 
 Active Link: https://syntaxwarrior30.github.io/Documentation-Wizard/
