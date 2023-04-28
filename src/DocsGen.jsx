@@ -29,6 +29,19 @@ function DocsGen () {
   const [error, isError] = useState(false);
   const successAudio = new Audio('./Success.wav');
   const errorAudio = new Audio('./Error.wav');
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (showToast) {
+      timer = setTimeout(() => {
+        setShowToast(false);
+      }, 2200);
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [showToast]);
 
   useEffect(() => {
     clearAbortController();
@@ -110,32 +123,36 @@ function DocsGen () {
   async function generateDocs() {
     setResponse('Your altered code will appear here');
     isError(false);
-    const textIn = editorRef.current.getValue();
-    if (textIn.trim() !== '') {
-      startInterval();
-      await new Promise(resolve => {
-        setTimeout(resolve, 1000);
-      });
-      if (countTokens(textIn) < 2048) {
-        const answer = await chatbot.ask("Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn, abortController.current);
-        if (answer === "Error") {
+      const textIn = editorRef.current.getValue();
+    if (loading) {
+      setShowToast(true);
+    } else {
+      if (textIn.trim() !== '') {
+        startInterval();
+        await new Promise(resolve => {
+          setTimeout(resolve, 1000);
+        });
+        if (countTokens(textIn) < 2048) {
+          const answer = await chatbot.ask("Properly format and add documentation/comments to this code (keep code under column 100): \n" + textIn, abortController.current);
+          if (answer === "Error") {
+            isError(true)
+            stopInterval();
+            setStatus("Error, Click To Try Again") 
+            errorAudio.play();
+          } else {
+            setResponse(answer);
+            stopInterval();
+            setStatus('Generate Documentation');
+            successAudio.play();
+          }
+        } else {
           isError(true)
           stopInterval();
-          setStatus("Error, Click To Try Again") 
+          setStatus("Input Is Too Long, Click To Try Again") 
           errorAudio.play();
-        } else {
-          setResponse(answer);
-          stopInterval();
-          setStatus('Generate Documentation');
-          successAudio.play();
         }
-      } else {
-        isError(true)
-        stopInterval();
-        setStatus("Input Is Too Long, Click To Try Again") 
-        errorAudio.play();
-      }
-    } 
+      } 
+    }
   }
 
   const handleFileSelect = (event) => {
@@ -195,7 +212,6 @@ function DocsGen () {
         <button 
           onClick={() => generateDocs()}
           className={buttonClass}
-          disabled={loading}
         >
           {status}
         </button>
@@ -226,6 +242,13 @@ function DocsGen () {
             </button>
           ) : null}
         </div>
+        {showToast &&
+          <div 
+            className={`bg-red-600 text-xs text-white px-4 py-2 rounded-md absolute top-2 right-2 mt-2 mr-2 fade-in-out`}
+          >
+            Generator is already running
+          </div>
+        }
       </div>
     </>
   )
