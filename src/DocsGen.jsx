@@ -27,6 +27,8 @@ function DocsGen () {
   const chatbot = new ChatGPT();
   const accept = Object.values(languageToFileExtension).join(",");
   const [error, isError] = useState(false);
+  const successAudio = new Audio('/Success.wav');
+  const errorAudio = new Audio('/Error.wav');
 
   useEffect(() => {
     resetAbortController();
@@ -111,7 +113,6 @@ function DocsGen () {
     const textIn = editorRef.current.getValue();
     if (textIn.trim() !== '') {
       startInterval();
-      console.log(countTokens(textIn));
       await new Promise(resolve => {
         setTimeout(resolve, 1000);
       });
@@ -121,15 +122,18 @@ function DocsGen () {
           isError(true)
           stopInterval();
           setStatus("Error, Click To Try Again") 
+          errorAudio.play();
         } else {
           setResponse(answer);
           stopInterval();
           setStatus('Generate Documentation');
+          successAudio.play();
         }
       } else {
         isError(true)
         stopInterval();
         setStatus("Input Is Too Long, Click To Try Again") 
+        errorAudio.play();
       }
     } 
   }
@@ -160,68 +164,70 @@ function DocsGen () {
   };
 
   return (
-    <div className="flex-col w-[100vh] h-[30vh] mx-auto space-y-2">   
+    <>
       <p className='py-2 text-xs hover:text-green-600 text-white text-center'>
         Programming Language Detected: {language}
       </p>
-      <Tooltip
-        title={"Can't upload files during generation"}
-        disabled={!loading}
-        duration={200}
-      >
-        <input
-          className="m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-green-600 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-gray-500 dark:file:text-neutral-100 dark:focus:border-primary"
-          type="file"
-          onChange={handleFileSelect}
+      <div className="flex-col w-[100vh] mx-auto space-y-2">   
+        <Tooltip
+          title={"Can't upload files during generation"}
+          disabled={!loading}
+          duration={200}
+        >
+          <input
+            className="m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-green-600 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-gray-500 dark:file:text-neutral-100 dark:focus:border-primary"
+            type="file"
+            onChange={handleFileSelect}
+            disabled={loading}
+            ref={fileInputRef}
+            accept={accept}
+          />    
+        </Tooltip>
+        <Editor
+          theme='vs-dark'
+          language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
+          onMount={handleEditorDidMount}
+          value={value}
+          onChange={handleEditorChange}
+          className='h-[30vh] rounded-md'
+          options={{domReadOnly: loading, readOnly: loading}}
+        />
+        <button 
+          onClick={() => generateDocs()}
+          className={buttonClass}
           disabled={loading}
-          ref={fileInputRef}
-          accept={accept}
-        />    
-      </Tooltip>
-      <Editor
-        theme='vs-dark'
-        language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
-        onMount={handleEditorDidMount}
-        value={value}
-        onChange={handleEditorChange}
-        className='h-[30vh] rounded-md'
-        options={{domReadOnly: loading, readOnly: loading}}
-      />
-      <button 
-        onClick={() => generateDocs()}
-        className={buttonClass}
-        disabled={loading}
-      >
-        {status}
-      </button>
-      <PrismSyntaxHighlighter
-        language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
-        style={vscDarkPlus}
-        className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
-      >
-        {response}
-      </PrismSyntaxHighlighter>
-      <div className='flex-row space-x-2'>
-        {(!loading && value) ? (
-          <button
-            onClick={resetButtonClick}
-            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
-          >
-            Reset
-          </button>
-        ) : null}
-        <CopyButton content={response} response={response} loading={loading}/>
-        <DownloadButton content={response} fileType={fileExtension} response={response} loading={loading}/>
-        {loading ? (
-          <button
-            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-red-600 rounded-md'
-            onClick={handleAbort}
-          >
-            Cancel
-          </button>
-        ) : null}
+        >
+          {status}
+        </button>
+        <PrismSyntaxHighlighter
+          language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
+          style={vscDarkPlus}
+          className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
+        >
+          {response}
+        </PrismSyntaxHighlighter>
+        <div className='flex-row space-x-2'>
+          {(!loading && value) ? (
+            <button
+              onClick={resetButtonClick}
+              className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
+            >
+              Reset
+            </button>
+          ) : null}
+          <CopyButton content={response} response={response} loading={loading}/>
+          <DownloadButton content={response} fileType={fileExtension} response={response} loading={loading}/>
+          {loading ? (
+            <button
+              className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-red-600 rounded-md'
+              onClick={handleAbort}
+            >
+              Cancel
+            </button>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   )
 };
   
