@@ -27,8 +27,8 @@ function DocsGen () {
   const chatbot = new ChatGPT();
   const accept = Object.values(languageToFileExtension).join(",");
   const [error, isError] = useState(false);
-  const successAudio = new Audio('/Success.wav');
-  const errorAudio = new Audio('/Error.wav');
+  const successAudio = new Audio('./Success.wav');
+  const errorAudio = new Audio('./Error.wav');
 
   useEffect(() => {
     clearAbortController();
