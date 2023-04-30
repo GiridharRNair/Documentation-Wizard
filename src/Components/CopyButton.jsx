@@ -14,6 +14,7 @@ function CopyButton({ content = '', response = '', loading = '' }) {
       {(response !== "Your altered code will appear here" && response !== "Abort Success" && !loading) ? (
         <>
           <button
+            title='Copy to clipboard'
             onClick={onClick}
             className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
           >

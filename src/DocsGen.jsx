@@ -207,6 +207,7 @@ function DocsGen () {
           duration={200}
         >
           <input
+            title="Upload files"
             className="m-0 block w-full min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-base font-normal text-neutral-700 transition duration-300 ease-in-out file:-mx-3 file:-my-[0.32rem] file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-green-600 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:file:bg-gray-500 dark:file:text-neutral-100 dark:focus:border-primary"
             type="file"
             onChange={handleFileSelect}
@@ -217,6 +218,7 @@ function DocsGen () {
         </Tooltip>
         <Editor
           theme='vs-dark'
+          title="Input Editor"
           language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
           onMount={handleEditorDidMount}
           value={value}
@@ -226,11 +228,13 @@ function DocsGen () {
         />
         <button 
           onClick={() => generateDocs()}
+          title='Generate Documentation'
           className={buttonClass}
         >
           {status}
         </button>
         <PrismSyntaxHighlighter
+          title="Output Editor"
           language={response !== 'Your altered code will appear here' ? ((language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()) : null}
           style={vscDarkPlus}
           className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
@@ -240,6 +244,7 @@ function DocsGen () {
         <div className='flex-row space-x-2'>
           {(!loading && value || (response !== 'Your altered code will appear here')) ? (
             <button
+              title="Clear"
               onClick={clearButtonClick}
               className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
             >
@@ -250,6 +255,7 @@ function DocsGen () {
           <DownloadButton content={response} fileType={fileExtension} response={response} loading={loading}/>
           {loading ? (
             <button
+              title='Abort generation'
               className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-red-600 rounded-md'
               onClick={handleAbort}
             >

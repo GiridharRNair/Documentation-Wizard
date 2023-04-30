@@ -14,7 +14,7 @@ function App() {
         To get started, input the code you want documentation for in the code editor below.
       </p>
       <DocsGen />
-      <div className='underline text-xs text-white hover:text-green-600 fixed bottom-2 right-2'>
+      <div title="Go to site's Github" className='underline text-xs text-white hover:text-green-600 fixed bottom-2 right-2'>
         <a href="https://github.com/SyntaxWarrior30/Documentation-Generator" target="_blank" rel="noopener noreferrer">Github</a>
       </div>  
       <div className="fixed z-[-1] top-0 left-0 right-0 bottom-0 bg-neutral-900">
