@@ -16,7 +16,7 @@ function DownloadButton({ content = '', fileType = '', response = '', loading = 
   
     return (
         <>
-            {(response !== "Your altered code will appear here" && !loading) ? (
+            {(response !== "Your altered code will appear here" && response !== "Abort Success" && !loading) ? (
                 <button
                     onClick={handleDownload}
                     className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'

@@ -29,7 +29,10 @@ function DocsGen () {
   const [error, isError] = useState(false);
   const successAudio = new Audio('./Success.wav');
   const errorAudio = new Audio('./Error.wav');
+  successAudio.volume = 0.5;
+  errorAudio.volume = 0.5;
   const [showToast, setShowToast] = useState(false);
+  const [abortToast, setAbortToast] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -42,6 +45,18 @@ function DocsGen () {
       clearTimeout(timer);
     };
   }, [showToast]);
+
+  useEffect(() => {
+    let timer;
+    if (abortToast) {
+      timer = setTimeout(() => {
+        setAbortToast(false);
+      }, 2200);
+    }
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [abortToast]);
 
   useEffect(() => {
     clearAbortController();
@@ -58,6 +73,7 @@ function DocsGen () {
     if (abortController.current) {
       abortController.current.abort();
       clearAbortController();
+      setAbortToast(true);
     }
   };
 
@@ -71,7 +87,6 @@ function DocsGen () {
     {
       'text-black': (status === 'Generate Documentation'),
       'text-red-800 shake': (error && (status === 'Error, Click To Try Again' || status === 'Input Is Too Long, Click To Try Again')),
-      'disabled' : (loading)
     }
   )
 
@@ -123,7 +138,7 @@ function DocsGen () {
   async function generateDocs() {
     setResponse('Your altered code will appear here');
     isError(false);
-      const textIn = editorRef.current.getValue();
+    const textIn = editorRef.current.getValue();
     if (loading) {
       setShowToast(true);
     } else {
@@ -148,7 +163,7 @@ function DocsGen () {
         } else {
           isError(true)
           stopInterval();
-          setStatus("Input Is Too Long, Click To Try Again") 
+          setStatus("Input Is Too Long, Click To Try Again");
           errorAudio.play();
         }
       } 
@@ -216,7 +231,7 @@ function DocsGen () {
           {status}
         </button>
         <PrismSyntaxHighlighter
-          language={(language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()}
+          language={response !== 'Your altered code will appear here' ? ((language === "C++") ? "cpp" : (language === "C#") ? "csharp" : language.toLowerCase()) : null}
           style={vscDarkPlus}
           className="h-[30vh] overflow-y-scroll no-scrollbar rounded-md"
         >
@@ -242,13 +257,22 @@ function DocsGen () {
             </button>
           ) : null}
         </div>
-        {showToast &&
-          <div 
-            className={`bg-red-600 text-xs text-white px-4 py-2 rounded-md absolute top-2 right-2 mt-2 mr-2 fade-in-out`}
-          >
-            Generator is already running
-          </div>
-        }
+        <div className='fixed justify-end right-2 top-2'>
+          {showToast &&
+            <div 
+              className={`w-auto bg-red-600 text-xs text-white px-4 justify-right py-2 rounded-md top-2 right-2 mt-2 mr-2 fade-in-out`}
+            >
+              Generator is already running
+            </div>
+          }
+          {abortToast &&
+            <div
+              className={`bg-green-600 w-auto text-xs text-white justify-right px-4 py-2 rounded-md top-2 right-2 mt-2 mr-2 fade-in-out`}
+            >
+              Abort Success               
+            </div>
+          }
+        </div>
       </div>
     </>
   )

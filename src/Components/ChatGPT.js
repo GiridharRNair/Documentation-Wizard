@@ -29,7 +29,7 @@ class ChatGPT {
             return data.choices[0].message.content;
         } catch (error) {
             if (error.name === "AbortError") {
-                return "Abort Success";
+                return "Your altered code will appear here";
             } else {
                 return "Error";
             }

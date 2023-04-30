@@ -11,7 +11,7 @@ function CopyButton({ content = '', response = '', loading = '' }) {
 
   return (
     <>
-      {(response !== "Your altered code will appear here" && !loading) ? (
+      {(response !== "Your altered code will appear here" && response !== "Abort Success" && !loading) ? (
         <>
           <button
             onClick={onClick}
