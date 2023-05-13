@@ -20,7 +20,7 @@ function DownloadButton({ content = '', fileType = '', response = '', loading = 
                 <button
                     title='Download contents'
                     onClick={handleDownload}
-                    className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
+                    className='text-xs bg-gray-500 w-full md:w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
                 >
                     Download
                 </button>

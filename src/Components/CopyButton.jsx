@@ -16,7 +16,7 @@ function CopyButton({ content = '', response = '', loading = '' }) {
           <button
             title='Copy to clipboard'
             onClick={onClick}
-            className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
+            className='text-xs bg-gray-500 w-full md:w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
           >
             {isCopied ? "Copied" : "Copy"}
           </button>

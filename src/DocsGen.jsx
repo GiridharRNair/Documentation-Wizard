@@ -241,12 +241,12 @@ function DocsGen () {
         >
           {response}
         </PrismSyntaxHighlighter>
-        <div className='flex-row space-x-2'>
+        <div className='flex md:flex-row flex-col md:space-y-0 space-y-2 md:space-x-2'>
           {(!loading && value || (response !== 'Your altered code will appear here')) ? (
             <button
               title="Clear"
               onClick={clearButtonClick}
-              className='text-xs bg-gray-500 w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
+              className='text-xs bg-gray-500 w-full md:w-[20vh] h-[4vh] hover:bg-green-600 rounded-md'
             >
               Clear
             </button>
